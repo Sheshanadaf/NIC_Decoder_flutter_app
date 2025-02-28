@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the parseNIC method from the NicParser class, for the Dart programming language.">
+  <title>parseNIC method - NicParser class - nic_parser library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">flutter_application_1</a></li>
+    <li><a href="../../utils_nic_parser/utils_nic_parser-library.html">utils\nic_parser.dart</a></li>
+    <li><a href="../../utils_nic_parser/NicParser-class.html">NicParser</a></li>
+    <li class="self-crumb">parseNIC static method</li>
+  </ol>
+  <div class="self-name">parseNIC</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button" title="Toggle brightness">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        dark_mode
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        light_mode
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="utils_nic_parser&#47;NicParser-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">parseNIC</span> static method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
+<span class="name ">parseNIC</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="parseNIC-param-nic"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">nic</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static Map&lt;String, dynamic&gt; parseNIC(String nic) {
+  bool isOldFormat = nic.length == 10;
+  bool isNewFormat = nic.length == 12;
+
+  if (!isOldFormat &amp;&amp; !isNewFormat) {
+    return {&#39;error&#39;: &#39;Invalid NIC format&#39;};
+  }
+
+  int birthYear;
+  int dayOfYear;
+  String gender;
+  String? votingStatus;
+
+  if (isOldFormat) {
+    birthYear = 1900 + int.parse(nic.substring(0, 2));
+    dayOfYear = int.parse(nic.substring(2, 5));
+
+    &#47;&#47; Check the last letter for voting status
+    String lastChar = nic.substring(9).toUpperCase();
+    if (lastChar.toUpperCase() == &#39;V&#39;) {
+      votingStatus = &#39;Can Vote&#39;;
+    } else if (lastChar.toUpperCase() == &#39;X&#39;) {
+      votingStatus = &#39;Cannot Vote&#39;;
+    }
+  } else {
+    birthYear = int.parse(nic.substring(0, 4));
+    dayOfYear = int.parse(nic.substring(4, 7));
+  }
+
+  &#47;&#47; Determine gender and adjust day of year
+  if (dayOfYear &gt; 500) {
+    gender = &#39;Female&#39;;
+    dayOfYear -= 500;
+  } else {
+    gender = &#39;Male&#39;;
+  }
+
+  &#47;&#47; Check if the birth year is a leap year
+  bool isLeapYear = (birthYear % 4 == 0 &amp;&amp; birthYear % 100 != 0) || (birthYear % 400 == 0);
+
+  &#47;&#47; Days in each month (adjusting for leap years)
+  List&lt;int&gt; daysInMonth = [
+    31, &#47;&#47; January
+    isLeapYear ? 29 : 28, &#47;&#47; February
+    31, &#47;&#47; March
+    30, &#47;&#47; April
+    31, &#47;&#47; May
+    30, &#47;&#47; June
+    31, &#47;&#47; July
+    31, &#47;&#47; August
+    30, &#47;&#47; September
+    31, &#47;&#47; October
+    30, &#47;&#47; November
+    31  &#47;&#47; December
+  ];
+
+  &#47;&#47; Determine the birth month and day
+  int month = 1;
+  int day = dayOfYear;
+
+  for (int i = 0; i &lt; 12; i++) {
+    if (day &gt; daysInMonth[i]) {
+      day -= daysInMonth[i];
+      month++;
+    } else {
+      break;
+    }
+  }
+
+  &#47;&#47; Construct the birth date
+  DateTime birthDate = DateTime(birthYear, month, day);
+  String dobFormatted = DateFormat(&#39;yyyy-MM-dd&#39;).format(birthDate);
+  String weekday = DateFormat(&#39;EEEE&#39;).format(birthDate);
+  int age = DateTime.now().year - birthYear;
+
+  return {
+    &#39;format&#39;: isOldFormat ? &#39;Old NIC (9 digits)&#39; : &#39;New NIC (12 digits)&#39;,
+    &#39;dob&#39;: dobFormatted,
+    &#39;age&#39;: age,
+    &#39;weekday&#39;: weekday,
+    &#39;gender&#39;: gender,
+    if (isOldFormat) &#39;voting_status&#39;: votingStatus, &#47;&#47; Include voting status only for old NIC
+  };
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">flutter_application_1</a></li>
+    <li><a href="../../utils_nic_parser/utils_nic_parser-library.html">nic_parser</a></li>
+    <li><a href="../../utils_nic_parser/NicParser-class.html">NicParser</a></li>
+    <li class="self-crumb">parseNIC static method</li>
+</ol>
+
+    <h5>NicParser class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    flutter_application_1
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
